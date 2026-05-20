@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
         emailOrderBtn.addEventListener('click', () => {
             // Open user's default email client
             const mailtoUrl = `mailto:order@raccoon-coffee.com?subject=${encodeURIComponent('浣熊咖啡新訂單 - ' + document.getElementById('nameInput').value)}&body=${encodeURIComponent(generatedOrderText)}`;
-            window.open(mailtoUrl, '_blank');
+            window.location.href = mailtoUrl;
         });
     }
 });
