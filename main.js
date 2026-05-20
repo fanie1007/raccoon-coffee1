@@ -65,6 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let isDragging = false;
         let startX = 0;
+        let startY = 0;
+        let dragThreshold = 6; // px to differentiate drag vs click
+        let wasDragged = false;
         let currentAngle = 0; 
         let rotationY = 0;    
         let autoRotate = true;
@@ -86,15 +89,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const handleDragStart = (e) => {
             isDragging = true;
             autoRotate = false;
+            wasDragged = false;
             galleryContainer.style.cursor = 'grabbing';
             startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+            startY = e.type.includes('mouse') ? e.pageY : e.touches[0].clientY;
             carousel.style.transition = 'none';
         };
 
         const handleDragMove = (e) => {
             if (!isDragging) return;
             const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+            const currentY = e.type.includes('mouse') ? e.pageY : e.touches[0].clientY;
             const diffX = currentX - startX;
+            const diffY = currentY - startY;
+            
+            // Check if user dragged beyond threshold
+            if (Math.abs(diffX) > dragThreshold || Math.abs(diffY) > dragThreshold) {
+                wasDragged = true;
+            }
+            
             rotationY = currentAngle + (diffX * 0.5);
             carousel.style.transform = `rotateY(${rotationY}deg)`;
         };
@@ -108,7 +121,9 @@ document.addEventListener('DOMContentLoaded', () => {
             carousel.style.transition = 'transform 0.1s ease-out';
             
             setTimeout(() => {
-                if (!isDragging) autoRotate = true;
+                const lightbox = document.getElementById('galleryLightbox');
+                const isLightboxActive = lightbox && lightbox.classList.contains('active');
+                if (!isDragging && !isLightboxActive) autoRotate = true;
             }, 3000);
         };
 
@@ -118,6 +133,90 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('touchmove', handleDragMove, {passive: true});
         window.addEventListener('mouseup', handleDragEnd);
         window.addEventListener('touchend', handleDragEnd);
+
+        // Lightbox Logic inside the Carousel block to control auto-rotation
+        const lightbox = document.getElementById('galleryLightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        const lightboxClose = document.getElementById('lightboxClose');
+        const lightboxPrev = document.getElementById('lightboxPrev');
+        const lightboxNext = document.getElementById('lightboxNext');
+        
+        let activeImageIndex = 0;
+        const imagesList = Array.from(items).map(item => item.querySelector('img').getAttribute('src'));
+        
+        const openLightbox = (index) => {
+            activeImageIndex = index;
+            if (lightboxImg) lightboxImg.src = imagesList[activeImageIndex];
+            if (lightbox) lightbox.classList.add('active');
+            autoRotate = false; // Pause 3D carousel rotation
+        };
+        
+        const closeLightbox = () => {
+            if (lightbox) lightbox.classList.remove('active');
+            // Resume 3D carousel after 2 seconds
+            setTimeout(() => {
+                if (!isDragging && (!lightbox || !lightbox.classList.contains('active'))) {
+                    autoRotate = true;
+                }
+            }, 2000);
+        };
+        
+        const showNextImage = () => {
+            activeImageIndex = (activeImageIndex + 1) % imagesList.length;
+            if (lightboxImg) {
+                lightboxImg.style.opacity = '0';
+                setTimeout(() => {
+                    lightboxImg.src = imagesList[activeImageIndex];
+                    lightboxImg.style.opacity = '1';
+                }, 150);
+            }
+        };
+        
+        const showPrevImage = () => {
+            activeImageIndex = (activeImageIndex - 1 + imagesList.length) % imagesList.length;
+            if (lightboxImg) {
+                lightboxImg.style.opacity = '0';
+                setTimeout(() => {
+                    lightboxImg.src = imagesList[activeImageIndex];
+                    lightboxImg.style.opacity = '1';
+                }, 150);
+            }
+        };
+
+        // Add opacity transition to lightbox image
+        if (lightboxImg) {
+            lightboxImg.style.transition = 'opacity 0.15s ease-in-out';
+        }
+        
+        // Click on carousel items to open lightbox
+        items.forEach((item, index) => {
+            item.addEventListener('click', (e) => {
+                // If it was a drag, don't open
+                if (wasDragged) return;
+                openLightbox(index);
+            });
+        });
+        
+        if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+        if (lightboxPrev) lightboxPrev.addEventListener('click', showPrevImage);
+        if (lightboxNext) lightboxNext.addEventListener('click', showNextImage);
+        
+        // Close on overlay background click
+        if (lightbox) {
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) {
+                    closeLightbox();
+                }
+            });
+        }
+        
+        // Keyboard controls
+        window.addEventListener('keydown', (e) => {
+            if (!lightbox || !lightbox.classList.contains('active')) return;
+            if (e.key === 'ArrowRight') showNextImage();
+            if (e.key === 'ArrowLeft') showPrevImage();
+            if (e.key === 'Escape') closeLightbox();
+        });
     }
 
     // Smooth scrolling for anchor links
