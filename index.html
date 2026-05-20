@@ -76,6 +76,7 @@
                             <p class="tasting-notes">黑巧克力 / 烤核桃 / 煙燻焦糖</p>
                             <p class="desc">我們最經典的深焙配方。強烈、濃厚，帶有迷人的煙燻尾韻，適合需要極度專注的深夜時光。</p>
                             <div class="price">NT$ 450 <span class="unit">/ 半磅</span></div>
+                            <a href="#order" class="btn-primary small select-product-btn" data-product="夜行者濃縮 (Midnight Forager)" style="margin-top: 1rem; display: inline-block;">選購此風味</a>
                         </div>
                     </div>
 
@@ -89,6 +90,7 @@
                             <p class="tasting-notes">柑橘 / 蜂蜜 / 茉莉花香</p>
                             <p class="desc">明亮活潑的中淺焙配方。入口即化的蜂蜜甜感與優雅的花香，宛如清晨森林中的第一道曙光。</p>
                             <div class="price">NT$ 520 <span class="unit">/ 半磅</span></div>
+                            <a href="#order" class="btn-primary small select-product-btn" data-product="樹冠特調 (Canopy Reserve)" style="margin-top: 1rem; display: inline-block;">選購此風味</a>
                         </div>
                     </div>
 
@@ -102,8 +104,83 @@
                             <p class="tasting-notes">烤榛果 / 麥芽糖 / 可可</p>
                             <p class="desc">瑞士水洗法處理的低咖啡因豆。偷走了咖啡因，卻完美保留了咖啡的醇厚風味。</p>
                             <div class="price">NT$ 480 <span class="unit">/ 半磅</span></div>
+                            <a href="#order" class="btn-primary small select-product-btn" data-product="神偷低因 (The Bandit Decaf)" style="margin-top: 1rem; display: inline-block;">選購此風味</a>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="order" class="order">
+            <div class="container">
+                <div class="section-header fade-up">
+                    <div class="section-badge">Fast Order</div>
+                    <h2>立即<span class="text-orange">點餐</span></h2>
+                    <p>填寫下方表單以產生訂單，送出後可透過 LINE 或 Email 直接發送給商家</p>
+                </div>
+                
+                <div class="order-container glass-card fade-up">
+                    <form id="orderForm" class="order-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="beanSelect">選擇咖啡豆</label>
+                                <select id="beanSelect" name="bean" required>
+                                    <option value="" disabled selected>請選擇您想要的風味...</option>
+                                    <option value="夜行者濃縮 (Midnight Forager)">夜行者濃縮 (Midnight Forager) - NT$ 450</option>
+                                    <option value="樹冠特調 (Canopy Reserve)">樹冠特調 (Canopy Reserve) - NT$ 520</option>
+                                    <option value="神偷低因 (The Bandit Decaf)">神偷低因 (The Bandit Decaf) - NT$ 480</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="grindSelect">研磨度需求</label>
+                                <select id="grindSelect" name="grind" required>
+                                    <option value="不磨粉（咖啡豆）">不磨粉（咖啡豆）</option>
+                                    <option value="義式濃縮（較細）">義式濃縮（較細）</option>
+                                    <option value="手沖 / 滴濾（中等）">手沖 / 滴濾（中等）</option>
+                                    <option value="法式濾壓壺 / 摩卡壺（較粗）">法式濾壓壺 / 摩卡壺（較粗）</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="qtyInput">數量（半磅/包）</label>
+                                <input type="number" id="qtyInput" name="quantity" min="1" max="100" value="1" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="deliverySelect">配送方式</label>
+                                <select id="deliverySelect" name="delivery" required>
+                                    <option value="宅配到府">宅配到府 (運費 NT$ 80)</option>
+                                    <option value="超商取貨付款">超商取貨付款 (運費 NT$ 60)</option>
+                                    <option value="自取 (免運費)">自取 (免運費)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="nameInput">收件人姓名</label>
+                                <input type="text" id="nameInput" name="name" placeholder="請輸入收件人姓名" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phoneInput">聯絡電話</label>
+                                <input type="tel" id="phoneInput" name="phone" placeholder="例如：0912345678" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="addressInput">收件地址 / 超商門市資訊</label>
+                            <input type="text" id="addressInput" name="address" placeholder="請輸入詳細收件地址，若為超商取貨請寫明超商名稱與門市（如：7-11 捷運門市）" required>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="notesInput">備註（選填）</label>
+                            <textarea id="notesInput" name="notes" rows="3" placeholder="如有其他特殊需求，請在此填寫..."></textarea>
+                        </div>
+                        
+                        <div class="form-submit">
+                            <button type="submit" class="btn-primary">確認送出，產生訂單</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </section>
@@ -169,6 +246,26 @@
             <p>&copy; 2026 Raccoon Coffee. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- Order Success Modal -->
+    <div id="successModal" class="modal-overlay">
+        <div class="modal-content glass-card">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <div class="modal-header">
+                <span class="success-icon">☕️</span>
+                <h3>訂單明細已產生！</h3>
+                <p>請選擇下方其中一種方式發送給商家以完成點餐：</p>
+            </div>
+            <div class="order-summary" id="orderSummaryText">
+                <!-- Pre-filled order text will be displayed here -->
+            </div>
+            <div class="modal-actions">
+                <button id="copyOrderBtn" class="btn-outline">📋 複製明細</button>
+                <button id="lineOrderBtn" class="btn-primary">💬 LINE 點餐</button>
+                <button id="emailOrderBtn" class="btn-outline">✉️ Email 點餐</button>
+            </div>
+        </div>
+    </div>
 
     <script src="main.js"></script>
 </body>

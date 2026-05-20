@@ -142,4 +142,128 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Select Product Buttons handler
+    const selectProductButtons = document.querySelectorAll('.select-product-btn');
+    const beanSelect = document.getElementById('beanSelect');
+    
+    selectProductButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productName = this.getAttribute('data-product');
+            if (beanSelect && productName) {
+                beanSelect.value = productName;
+            }
+        });
+    });
+
+    // Form submission & Modal logic
+    const orderForm = document.getElementById('orderForm');
+    const successModal = document.getElementById('successModal');
+    const closeModal = document.getElementById('closeModal');
+    const orderSummaryText = document.getElementById('orderSummaryText');
+    const copyOrderBtn = document.getElementById('copyOrderBtn');
+    const lineOrderBtn = document.getElementById('lineOrderBtn');
+    const emailOrderBtn = document.getElementById('emailOrderBtn');
+    
+    let generatedOrderText = '';
+
+    if (orderForm && successModal) {
+        orderForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(orderForm);
+            const bean = formData.get('bean');
+            const grind = formData.get('grind');
+            const quantity = formData.get('quantity');
+            const delivery = formData.get('delivery');
+            const name = formData.get('name');
+            const phone = formData.get('phone');
+            const address = formData.get('address');
+            const notes = formData.get('notes') || '無';
+            
+            // Calculate pricing
+            let pricePerBag = 0;
+            if (bean.includes('夜行者濃縮')) pricePerBag = 450;
+            else if (bean.includes('樹冠特調')) pricePerBag = 520;
+            else if (bean.includes('神偷低因')) pricePerBag = 480;
+            
+            let shippingFee = 0;
+            if (delivery === '宅配到府') shippingFee = 80;
+            else if (delivery === '超商取貨付款') shippingFee = 60;
+            
+            const subtotal = pricePerBag * parseInt(quantity);
+            const total = subtotal + shippingFee;
+
+            generatedOrderText = `【 浣熊咖啡 Raccoon Coffee 訂單明細 】
+----------------------------------
+☕️ 訂購品項：${bean}
+🐾 研磨需求：${grind}
+📦 訂購數量：${quantity} 包 (半磅/包)
+🚚 配送方式：${delivery}
+
+👤 收件人姓名：${name}
+📞 聯絡電話：${phone}
+🏠 收件地址/門市：${address}
+📝 備註：${notes}
+
+----------------------------------
+💰 商品金額：NT$ ${subtotal}
+🚚 運費：NT$ ${shippingFee}
+💳 應付總金額：NT$ ${total}
+----------------------------------
+※ 商家收到訊息後會盡快與您聯絡確認匯款及寄送資訊！`;
+
+            if (orderSummaryText) {
+                orderSummaryText.textContent = generatedOrderText;
+            }
+            
+            successModal.classList.add('active');
+        });
+    }
+
+    if (closeModal && successModal) {
+        closeModal.addEventListener('click', () => {
+            successModal.classList.remove('active');
+        });
+        
+        // Close modal when clicking outside content
+        successModal.addEventListener('click', (e) => {
+            if (e.target === successModal) {
+                successModal.classList.remove('active');
+            }
+        });
+    }
+
+    // Modal Action Buttons
+    if (copyOrderBtn) {
+        copyOrderBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(generatedOrderText)
+                .then(() => {
+                    const originalText = copyOrderBtn.textContent;
+                    copyOrderBtn.textContent = '✅ 已複製！';
+                    setTimeout(() => {
+                        copyOrderBtn.textContent = originalText;
+                    }, 2000);
+                })
+                .catch(err => {
+                    alert('複製失敗，請手動選取複製！');
+                });
+        });
+    }
+
+    if (lineOrderBtn) {
+        lineOrderBtn.addEventListener('click', () => {
+            // Line share text endpoint: https://line.me/R/msg/text/?{encoded_text}
+            const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(generatedOrderText)}`;
+            window.open(lineUrl, '_blank');
+        });
+    }
+
+    if (emailOrderBtn) {
+        emailOrderBtn.addEventListener('click', () => {
+            // Open user's default email client
+            const mailtoUrl = `mailto:order@raccoon-coffee.com?subject=${encodeURIComponent('浣熊咖啡新訂單 - ' + document.getElementById('nameInput').value)}&body=${encodeURIComponent(generatedOrderText)}`;
+            window.open(mailtoUrl, '_blank');
+        });
+    }
 });
