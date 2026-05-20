@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Hero Ambient Canvas Background (Swirl Effect) ---
     const initHeroBackground = () => {
         const heroContainer = document.getElementById('heroCanvasContainer');
-        if (!heroContainer || typeof SimplexNoise === 'undefined') return;
+        if (!heroContainer) return;
 
         const { PI, cos, sin, abs, random } = Math;
         const TAU = 2 * PI;
@@ -393,13 +393,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const rangeRadius = 3.2;
         const baseHue = 12; // Orange / Red-orange base hue (HSL: ~12-47 degrees)
         const rangeHue = 35; 
-        const noiseSteps = 6;
-        const xOff = 0.00125;
-        const yOff = 0.00125;
-        const zOff = 0.0004;
-        const backgroundColor = 'rgba(18, 18, 18, 0.45)'; // Semi-transparent to let the banner.jpg show through
 
-        let canvas, ctx, center, tick, simplex, particleProps;
+        let canvas, ctx, center, tick, particleProps;
 
         function setup() {
             createCanvas();
@@ -410,7 +405,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function initParticles() {
             tick = 0;
-            simplex = new SimplexNoise();
             particleProps = new Float32Array(particlePropsLength);
             for (let i = 0; i < particlePropsLength; i += particlePropCount) {
                 initParticle(i);
@@ -441,9 +435,16 @@ document.addEventListener('DOMContentLoaded', () => {
             let i2=1+i, i3=2+i, i4=3+i, i5=4+i, i6=5+i, i7=6+i, i8=7+i, i9=8+i;
             let x = particleProps[i];
             let y = particleProps[i2];
-            let n = simplex.noise3D(x * xOff, y * yOff, tick * zOff) * noiseSteps * TAU;
-            let vx = lerp(particleProps[i3], cos(n), 0.5);
-            let vy = lerp(particleProps[i4], sin(n), 0.5);
+            
+            // Mathematical flowing vector field (smooth wave harmonics simulating simplex noise)
+            let angle = (
+                sin(x * 0.002 + tick * 0.004) * 1.5 +
+                cos(y * 0.003 - tick * 0.003) * 1.2 +
+                sin((x + y) * 0.001 + tick * 0.002) * 0.8
+            ) * PI;
+
+            let vx = lerp(particleProps[i3], cos(angle), 0.5);
+            let vy = lerp(particleProps[i4], sin(angle), 0.5);
             let life = particleProps[i5];
             let ttl = particleProps[i6];
             let speed = particleProps[i7];
@@ -503,8 +504,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function resize() {
-            const width = heroContainer.clientWidth;
-            const height = heroContainer.clientHeight;
+            const heroSection = document.getElementById('hero');
+            const width = window.innerWidth;
+            const height = heroSection ? heroSection.offsetHeight : window.innerHeight;
             
             canvas.a.width = width;
             canvas.a.height = height;
@@ -542,9 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
         function draw() {
             tick++;
             ctx.a.clearRect(0, 0, canvas.a.width, canvas.a.height);
-
-            ctx.b.fillStyle = backgroundColor;
-            ctx.b.fillRect(0, 0, canvas.a.width, canvas.a.height);
+            ctx.b.clearRect(0, 0, canvas.b.width, canvas.b.height);
 
             drawParticles();
             renderGlow();
